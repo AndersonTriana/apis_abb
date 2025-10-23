@@ -9,6 +9,8 @@
       "args": [
         "api_abb.main:app",
         "--reload",
+        "--host", "0.0.0.0",
+        "--port", "8001",
         "--app-dir", "api_abb/src"
       ],
       "python": "${workspaceFolder}/api_abb/.venv/bin/python",

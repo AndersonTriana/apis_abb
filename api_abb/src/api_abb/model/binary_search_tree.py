@@ -268,3 +268,38 @@ class BinarySearchTree:
         """Clear all nodes from the tree."""
         self.root = None
         self._size = 0
+    
+    def get_root(self) -> Optional[Node]:
+        """
+        Get the root node of the tree.
+        
+        Returns:
+            Root node or None if tree is empty
+        """
+        return self.root
+    
+    def get_min(self) -> Optional[Node]:
+        """
+        Get the node with minimum id in the tree.
+        
+        Returns:
+            Node with minimum id or None if tree is empty
+        """
+        if self.root is None:
+            return None
+        return self._find_min(self.root)
+    
+    def get_max(self) -> Optional[Node]:
+        """
+        Get the node with maximum id in the tree.
+        
+        Returns:
+            Node with maximum id or None if tree is empty
+        """
+        if self.root is None:
+            return None
+        
+        current = self.root
+        while current.right is not None:
+            current = current.right
+        return current

@@ -1,0 +1,298 @@
+{
+	"info": {
+		"_postman_id": "avl-tree-api-2024",
+		"name": "API Árbol AVL - Niños",
+		"description": "Colección de Postman para probar la API REST de gestión de niños usando un Árbol AVL.\n\nEl sistema almacena registros de niños en memoria usando un Árbol AVL auto-balanceado ordenado por el campo 'document'.\n\n**Puerto:** La API AVL corre en el puerto 8000 (http://localhost:8000)\n**Arquitectura:** API → Controller → Service → Model (AVL Tree)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Crear Niño",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response has document field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('document');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"document\": 123456,\n  \"name\": \"Juan Pérez García\",\n  \"age\": 10,\n  \"guardian\": \"María García\",\n  \"notes\": \"Alérgico al maní\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/children",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"children"
+					]
+				},
+				"description": "**Función:** Inserta un nuevo niño en el árbol AVL usando el número de documento como clave.\n\n**Validaciones:**\n- El documento debe ser único\n- Edad entre 0-18 años\n- Nombre es requerido\n\n**Respuestas:**\n- 201: Niño creado exitosamente\n- 400: Documento duplicado o datos inválidos\n- 422: Error de validación"
+			},
+			"response": []
+		},
+		{
+			"name": "Listar Todos los Niños (Inorden)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is an array\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/children?order=in",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"children"
+					],
+					"query": [
+						{
+							"key": "order",
+							"value": "in",
+							"description": "Tipo de recorrido: in (inorden), pre (preorden), post (postorden)"
+						}
+					]
+				},
+				"description": "**Función:** Lista todos los niños registrados usando recorrido inorden del árbol AVL (orden ascendente por documento).\n\n**Parámetros de Query:**\n- `order=in`: Recorrido inorden (ascendente) - **default**\n- `order=pre`: Recorrido preorden\n- `order=post`: Recorrido postorden\n\n**Respuestas:**\n- 200: Lista de niños obtenida exitosamente\n- 400: Parámetro order inválido"
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener Niño por Documento",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has all required fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('document');",
+							"    pm.expect(jsonData).to.have.property('name');",
+							"    pm.expect(jsonData).to.have.property('age');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/children/123456",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"children",
+						"123456"
+					]
+				},
+				"description": "**Función:** Busca y retorna la información de un niño específico usando su número de documento.\n\n**Parámetros de Path:**\n- `document`: Número de documento del niño a buscar\n\n**Respuestas:**\n- 200: Niño encontrado\n- 404: Niño no encontrado"
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar Niño",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Document remains unchanged\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.document).to.eql(123456);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Juan Carlos Pérez García\",\n  \"age\": 11,\n  \"guardian\": \"María García Sánchez\",\n  \"notes\": \"Alérgico al maní y lactosa\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/children/123456",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"children",
+						"123456"
+					]
+				},
+				"description": "**Función:** Actualiza la información de un niño existente. El campo 'document' NO puede ser modificado.\n\n**Parámetros de Path:**\n- `document`: Número de documento del niño a actualizar\n\n**Body:** Solo incluir los campos que se desean actualizar\n\n**Respuestas:**\n- 200: Niño actualizado exitosamente\n- 404: Niño no encontrado\n- 400: Datos de actualización inválidos"
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar Niño",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has success message\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"    pm.expect(jsonData.message).to.include('deleted');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/children/123456",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"children",
+						"123456"
+					]
+				},
+				"description": "**Función:** Elimina un niño del árbol AVL usando su número de documento.\n\n**Parámetros de Path:**\n- `document`: Número de documento del niño a eliminar\n\n**Respuestas:**\n- 200: Niño eliminado exitosamente\n- 404: Niño no encontrado"
+			},
+			"response": []
+		},
+		{
+			"name": "Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "**Función:** Verifica que el servidor API esté funcionando correctamente.\n\n**Respuestas:**\n- 200: API funcionando correctamente"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Tree Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has tree info\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('total_children');",
+							"    pm.expect(jsonData).to.have.property('is_empty');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/children/tree/info",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"children",
+						"tree",
+						"info"
+					]
+				},
+				"description": "**Función:** Obtiene información estadística sobre el árbol AVL.\n\n**Respuestas:**\n- 200: Información del árbol obtenida exitosamente"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	]
+}

@@ -1,17 +1,17 @@
 """
 API endpoints for managing children records.
 """
-from typing import List, Literal
-from fastapi import APIRouter, HTTPException, status, Query
+from typing import List, Literal, Annotated
+from fastapi import APIRouter, Depends, status, Query
 from api_abb.schemas.child import (
-    Child,
     ChildCreate,
     ChildUpdate,
     ChildResponse,
     MessageResponse,
     ErrorResponse
 )
-from api_abb.service.child_service import get_child_service
+from api_abb.controller.child_controller import ChildController
+from api_abb.service.child_service import get_child_service, ChildService
 
 
 router = APIRouter(
@@ -23,6 +23,21 @@ router = APIRouter(
         500: {"model": ErrorResponse, "description": "Error interno del servidor"}
     }
 )
+
+
+def get_child_controller(
+    service: Annotated[ChildService, Depends(get_child_service)]
+) -> ChildController:
+    """
+    Dependency injection for ChildController.
+    
+    Args:
+        service: Injected ChildService instance.
+    
+    Returns:
+        ChildController instance.
+    """
+    return ChildController(service)
 
 
 @router.post(
@@ -43,7 +58,10 @@ router = APIRouter(
         }
     }
 )
-async def create_child(child: ChildCreate):
+async def create_child(
+    child: ChildCreate,
+    controller: Annotated[ChildController, Depends(get_child_controller)]
+):
     """
     Crear un nuevo niño.
     
@@ -53,20 +71,7 @@ async def create_child(child: ChildCreate):
     - **acudiente**: Nombre del acudiente o tutor legal (opcional)
     - **notas**: Notas adicionales sobre el niño (opcional)
     """
-    try:
-        service = get_child_service()
-        created_child = service.create_child(child)
-        return created_child
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno del servidor: {str(e)}"
-        )
+    return controller.create_child(child)
 
 
 @router.get(
@@ -86,30 +91,16 @@ async def create_child(child: ChildCreate):
         }
     }
 )
-async def get_child(documento: int):
+async def get_child(
+    documento: int,
+    controller: Annotated[ChildController, Depends(get_child_controller)]
+):
     """
     Obtener un niño por su número de documento.
     
     - **documento**: Número de documento del niño a buscar
     """
-    try:
-        service = get_child_service()
-        child = service.get_child(documento)
-        
-        if child is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"No se encontró un niño con documento {documento}"
-            )
-        
-        return child
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno del servidor: {str(e)}"
-        )
+    return controller.get_child(documento)
 
 
 @router.get(
@@ -131,6 +122,7 @@ async def get_child(documento: int):
     }
 )
 async def get_all_children(
+    controller: Annotated[ChildController, Depends(get_child_controller)],
     order: Literal["in", "pre", "post"] = Query(
         default="in",
         description="Tipo de recorrido del árbol: 'in' (inorder/ascendente), 'pre' (preorder), 'post' (postorder)"
@@ -144,20 +136,7 @@ async def get_all_children(
         - `pre`: Recorrido preorder (raíz, izquierda, derecha)
         - `post`: Recorrido postorder (izquierda, derecha, raíz)
     """
-    try:
-        service = get_child_service()
-        children = service.get_all_children(order=order)
-        return children
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno del servidor: {str(e)}"
-        )
+    return controller.get_all_children(order=order)
 
 
 @router.put(
@@ -182,7 +161,11 @@ async def get_all_children(
         }
     }
 )
-async def update_child(documento: int, child_update: ChildUpdate):
+async def update_child(
+    documento: int,
+    child_update: ChildUpdate,
+    controller: Annotated[ChildController, Depends(get_child_controller)]
+):
     """
     Actualizar la información de un niño existente.
     
@@ -194,29 +177,7 @@ async def update_child(documento: int, child_update: ChildUpdate):
     
     Solo se actualizarán los campos proporcionados en la petición.
     """
-    try:
-        service = get_child_service()
-        updated_child = service.update_child(documento, child_update)
-        
-        if updated_child is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"No se encontró un niño con documento {documento}"
-            )
-        
-        return updated_child
-    except HTTPException:
-        raise
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno del servidor: {str(e)}"
-        )
+    return controller.update_child(documento, child_update)
 
 
 @router.delete(
@@ -236,27 +197,13 @@ async def update_child(documento: int, child_update: ChildUpdate):
         }
     }
 )
-async def delete_child(documento: int):
+async def delete_child(
+    documento: int,
+    controller: Annotated[ChildController, Depends(get_child_controller)]
+):
     """
     Eliminar un niño del sistema.
     
     - **documento**: Número de documento del niño a eliminar
     """
-    try:
-        service = get_child_service()
-        deleted = service.delete_child(documento)
-        
-        if not deleted:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"No se encontró un niño con documento {documento}"
-            )
-        
-        return MessageResponse(message=f"Niño con documento {documento} eliminado exitosamente")
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error interno del servidor: {str(e)}"
-        )
+    return controller.delete_child(documento)

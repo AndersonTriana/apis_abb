@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "abb-tree-api-2024",
 		"name": "API Árbol ABB - Niños",
-		"description": "Colección de Postman para probar la API REST de gestión de niños usando un Árbol Binario de Búsqueda (ABB).\n\nEl sistema almacena registros de niños en memoria usando un ABB ordenado por el campo 'documento'.",
+		"description": "Colección de Postman para probar la API REST de gestión de niños usando un Árbol Binario de Búsqueda (ABB).\n\nEl sistema almacena registros de niños en memoria usando un ABB ordenado por el campo 'documento'.\n\n**Puerto:** La API ABB corre en el puerto 8001 (http://localhost:8001)\n**Arquitectura:** API → Controller → Service → Model (Binary Search Tree)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -84,7 +84,7 @@
 						}
 					],
 					"cookie": [],
-					"body": "{\n  \"documento\": 1234567890,\n  \"nombre\": \"Juan Pérez García\",\n  \"edad\": 10,\n  \"acudiente\": \"María García\",\n  \"notas\": \"Alérgico al maní\"\n}"
+					"body": "{\n  \"nombre\": \"Juan Pérez García\",\n  \"edad\": 10,\n  \"acudiente\": \"María García\",\n  \"notas\": \"Alérgico al maní\",\n  \"documento\": 1234567890\n}"
 				},
 				{
 					"name": "400 - Documento Duplicado",
@@ -197,7 +197,7 @@
 						}
 					],
 					"cookie": [],
-					"body": "[\n  {\n    \"documento\": 1000000000,\n    \"nombre\": \"Ana López\",\n    \"edad\": 8,\n    \"acudiente\": \"Pedro López\",\n    \"notas\": null\n  },\n  {\n    \"documento\": 1234567890,\n    \"nombre\": \"Juan Pérez García\",\n    \"edad\": 10,\n    \"acudiente\": \"María García\",\n    \"notas\": \"Alérgico al maní\"\n  },\n  {\n    \"documento\": 9876543210,\n    \"nombre\": \"Carlos Rodríguez\",\n    \"edad\": 12,\n    \"acudiente\": \"Laura Rodríguez\",\n    \"notas\": null\n  }\n]"
+					"body": "[\n  {\n    \"nombre\": \"Ana López\",\n    \"edad\": 8,\n    \"acudiente\": \"Pedro López\",\n    \"notas\": null,\n    \"documento\": 1000000000\n  },\n  {\n    \"nombre\": \"Juan Pérez García\",\n    \"edad\": 10,\n    \"acudiente\": \"María García\",\n    \"notas\": \"Alérgico al maní\",\n    \"documento\": 1234567890\n  },\n  {\n    \"nombre\": \"Carlos Rodríguez\",\n    \"edad\": 12,\n    \"acudiente\": \"Laura Rodríguez\",\n    \"notas\": null,\n    \"documento\": 9876543210\n  }\n]"
 				}
 			]
 		},
@@ -265,7 +265,7 @@
 						}
 					],
 					"cookie": [],
-					"body": "{\n  \"documento\": 1234567890,\n  \"nombre\": \"Juan Pérez García\",\n  \"edad\": 10,\n  \"acudiente\": \"María García\",\n  \"notas\": \"Alérgico al maní\"\n}"
+					"body": "{\n  \"nombre\": \"Juan Pérez García\",\n  \"edad\": 10,\n  \"acudiente\": \"María García\",\n  \"notas\": \"Alérgico al maní\",\n  \"documento\": 1234567890\n}"
 				},
 				{
 					"name": "404 - Niño No Encontrado",
@@ -377,7 +377,7 @@
 						}
 					],
 					"cookie": [],
-					"body": "{\n  \"documento\": 1234567890,\n  \"nombre\": \"Juan Carlos Pérez García\",\n  \"edad\": 11,\n  \"acudiente\": \"María García Sánchez\",\n  \"notas\": \"Alérgico al maní y lactosa\"\n}"
+					"body": "{\n  \"nombre\": \"Juan Carlos Pérez García\",\n  \"edad\": 11,\n  \"acudiente\": \"María García Sánchez\",\n  \"notas\": \"Alérgico al maní y lactosa\",\n  \"documento\": 1234567890\n}"
 				},
 				{
 					"name": "404 - Niño No Encontrado",
@@ -576,7 +576,7 @@
 	"variable": [
 		{
 			"key": "base_url",
-			"value": "http://localhost:8000",
+			"value": "http://localhost:8001",
 			"type": "string"
 		}
 	]

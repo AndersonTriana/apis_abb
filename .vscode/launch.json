@@ -1,0 +1,55 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FastAPI (Uvicorn) - api_abb",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "api_abb.main:app",
+        "--reload",
+        "--app-dir", "api_abb/src"
+      ],
+      "python": "${workspaceFolder}/api_abb/.venv/bin/python",
+      "justMyCode": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "FastAPI (Uvicorn) - api_avl",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": [
+        "api_avl.main:app",
+        "--reload",
+        "--host", "0.0.0.0",
+        "--port", "8000",
+        "--app-dir", "api_avl/src"
+      ],
+      "python": "${workspaceFolder}/api_avl/.venv/bin/python",
+      "justMyCode": true,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/api_avl/src"
+      }
+    },
+    {
+      "name": "Pytest - api_avl",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/test_api_children.py",
+        "-v",
+        "--tb=short"
+      ],
+      "python": "${workspaceFolder}/api_avl/.venv/bin/python",
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/api_avl"
+    }
+  ]
+}

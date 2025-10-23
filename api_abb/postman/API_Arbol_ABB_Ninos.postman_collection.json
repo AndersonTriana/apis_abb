@@ -1,0 +1,583 @@
+{
+	"info": {
+		"_postman_id": "abb-tree-api-2024",
+		"name": "API Árbol ABB - Niños",
+		"description": "Colección de Postman para probar la API REST de gestión de niños usando un Árbol Binario de Búsqueda (ABB).\n\nEl sistema almacena registros de niños en memoria usando un ABB ordenado por el campo 'documento'.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Crear Niño",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response has documento field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('documento');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"documento\": 1234567890,\n  \"nombre\": \"Juan Pérez García\",\n  \"edad\": 10,\n  \"acudiente\": \"María García\",\n  \"notas\": \"Alérgico al maní\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/children",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"children"
+					]
+				},
+				"description": "**Función:** Inserta un nuevo niño en el árbol ABB usando el número de documento como clave.\n\n**Validaciones:**\n- El documento debe ser único\n- Edad entre 0-18 años\n- Nombre es requerido\n\n**Respuestas:**\n- 201: Niño creado exitosamente\n- 400: Documento duplicado o datos inválidos\n- 422: Error de validación"
+			},
+			"response": [
+				{
+					"name": "201 - Niño Creado",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"documento\": 1234567890,\n  \"nombre\": \"Juan Pérez García\",\n  \"edad\": 10,\n  \"acudiente\": \"María García\",\n  \"notas\": \"Alérgico al maní\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/children",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"children"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"documento\": 1234567890,\n  \"nombre\": \"Juan Pérez García\",\n  \"edad\": 10,\n  \"acudiente\": \"María García\",\n  \"notas\": \"Alérgico al maní\"\n}"
+				},
+				{
+					"name": "400 - Documento Duplicado",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"documento\": 1234567890,\n  \"nombre\": \"Otro Niño\",\n  \"edad\": 8\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/children",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"children"
+							]
+						}
+					},
+					"status": "Bad Request",
+					"code": 400,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"detail\": \"Ya existe un niño con documento 1234567890\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Listar Todos los Niños (Inorden)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response is an array\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/children?order=in",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"children"
+					],
+					"query": [
+						{
+							"key": "order",
+							"value": "in",
+							"description": "Tipo de recorrido: in (inorden), pre (preorden), post (postorden)"
+						}
+					]
+				},
+				"description": "**Función:** Lista todos los niños registrados usando recorrido inorden del árbol ABB (orden ascendente por documento).\n\n**Parámetros de Query:**\n- `order=in`: Recorrido inorden (ascendente) - **default**\n- `order=pre`: Recorrido preorden\n- `order=post`: Recorrido postorden\n\n**Respuestas:**\n- 200: Lista de niños obtenida exitosamente\n- 400: Parámetro order inválido"
+			},
+			"response": [
+				{
+					"name": "200 - Lista de Niños",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/children?order=in",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"children"
+							],
+							"query": [
+								{
+									"key": "order",
+									"value": "in"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "[\n  {\n    \"documento\": 1000000000,\n    \"nombre\": \"Ana López\",\n    \"edad\": 8,\n    \"acudiente\": \"Pedro López\",\n    \"notas\": null\n  },\n  {\n    \"documento\": 1234567890,\n    \"nombre\": \"Juan Pérez García\",\n    \"edad\": 10,\n    \"acudiente\": \"María García\",\n    \"notas\": \"Alérgico al maní\"\n  },\n  {\n    \"documento\": 9876543210,\n    \"nombre\": \"Carlos Rodríguez\",\n    \"edad\": 12,\n    \"acudiente\": \"Laura Rodríguez\",\n    \"notas\": null\n  }\n]"
+				}
+			]
+		},
+		{
+			"name": "Obtener Niño por Documento",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has all required fields\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('documento');",
+							"    pm.expect(jsonData).to.have.property('nombre');",
+							"    pm.expect(jsonData).to.have.property('edad');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/children/1234567890",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"children",
+						"1234567890"
+					]
+				},
+				"description": "**Función:** Busca y retorna la información de un niño específico usando su número de documento.\n\n**Parámetros de Path:**\n- `documento`: Número de documento del niño a buscar\n\n**Respuestas:**\n- 200: Niño encontrado\n- 404: Niño no encontrado"
+			},
+			"response": [
+				{
+					"name": "200 - Niño Encontrado",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/children/1234567890",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"children",
+								"1234567890"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"documento\": 1234567890,\n  \"nombre\": \"Juan Pérez García\",\n  \"edad\": 10,\n  \"acudiente\": \"María García\",\n  \"notas\": \"Alérgico al maní\"\n}"
+				},
+				{
+					"name": "404 - Niño No Encontrado",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/children/9999999999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"children",
+								"9999999999"
+							]
+						}
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"detail\": \"No se encontró un niño con documento 9999999999\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Actualizar Niño",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Documento remains unchanged\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.documento).to.eql(1234567890);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nombre\": \"Juan Carlos Pérez García\",\n  \"edad\": 11,\n  \"acudiente\": \"María García Sánchez\",\n  \"notas\": \"Alérgico al maní y lactosa\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/children/1234567890",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"children",
+						"1234567890"
+					]
+				},
+				"description": "**Función:** Actualiza la información de un niño existente. El campo 'documento' NO puede ser modificado.\n\n**Parámetros de Path:**\n- `documento`: Número de documento del niño a actualizar\n\n**Body:** Solo incluir los campos que se desean actualizar\n\n**Respuestas:**\n- 200: Niño actualizado exitosamente\n- 404: Niño no encontrado\n- 400: Datos de actualización inválidos"
+			},
+			"response": [
+				{
+					"name": "200 - Niño Actualizado",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"Juan Carlos Pérez García\",\n  \"edad\": 11,\n  \"acudiente\": \"María García Sánchez\",\n  \"notas\": \"Alérgico al maní y lactosa\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/children/1234567890",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"children",
+								"1234567890"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"documento\": 1234567890,\n  \"nombre\": \"Juan Carlos Pérez García\",\n  \"edad\": 11,\n  \"acudiente\": \"María García Sánchez\",\n  \"notas\": \"Alérgico al maní y lactosa\"\n}"
+				},
+				{
+					"name": "404 - Niño No Encontrado",
+					"originalRequest": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"edad\": 12\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/children/9999999999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"children",
+								"9999999999"
+							]
+						}
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"detail\": \"No se encontró un niño con documento 9999999999\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Eliminar Niño",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has success message\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"    pm.expect(jsonData.message).to.include('eliminado');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/children/1234567890",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"children",
+						"1234567890"
+					]
+				},
+				"description": "**Función:** Elimina un niño del árbol ABB usando su número de documento.\n\n**Parámetros de Path:**\n- `documento`: Número de documento del niño a eliminar\n\n**Respuestas:**\n- 200: Niño eliminado exitosamente\n- 404: Niño no encontrado"
+			},
+			"response": [
+				{
+					"name": "200 - Niño Eliminado",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/children/1234567890",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"children",
+								"1234567890"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"message\": \"Niño con documento 1234567890 eliminado exitosamente\"\n}"
+				},
+				{
+					"name": "404 - Niño No Encontrado",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/children/9999999999",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"children",
+								"9999999999"
+							]
+						}
+					},
+					"status": "Not Found",
+					"code": 404,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"detail\": \"No se encontró un niño con documento 9999999999\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "**Función:** Verifica que el servidor API esté funcionando correctamente.\n\n**Respuestas:**\n- 200: API funcionando correctamente"
+			},
+			"response": [
+				{
+					"name": "200 - API Healthy",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n  \"status\": \"healthy\"\n}"
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	]
+}

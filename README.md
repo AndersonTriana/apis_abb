@@ -80,10 +80,12 @@ PYTHONPATH=src .venv/bin/python -m pytest tests/ -v
 
 ## 📮 Colecciones de Postman
 
-- **ABB**: `api_abb/postman/API_Arbol_ABB_Ninos.postman_collection.json`
+- **ABB**: `api_abb/API_Arbol_ABB_Ninos.postman_collection.json`
 - **AVL**: `api_avl/API_Arbol_AVL_Ninos.postman_collection.json`
 
 Importa las colecciones en Postman para probar los endpoints.
+
+**Nota:** La colección ABB incluye el nuevo endpoint de reportes con tests automáticos.
 
 ## 📊 Arquitectura
 
@@ -101,6 +103,7 @@ API Routes → Controller → Service → Model (ABB/AVL Tree)
 - `GET /children/{documento}` - Obtener niño
 - `PUT /children/{documento}` - Actualizar niño
 - `DELETE /children/{documento}` - Eliminar niño
+- `GET /reports/children-by-city` - **Informe de niños por ciudad y género**
 - `GET /health` - Health check
 
 ### AVL (http://localhost:8000)
@@ -112,9 +115,56 @@ API Routes → Controller → Service → Model (ABB/AVL Tree)
 - `GET /children/tree/info` - Info del árbol
 - `GET /health` - Health check
 
+## 📊 Endpoint de Reportes (API ABB)
+
+### GET /reports/children-by-city
+
+Genera un informe estadístico con la cantidad de niños agrupados por ciudad, discriminados por género.
+
+**Características:**
+- Agrupa niños por ciudad
+- Cuenta niños masculinos y femeninos por separado
+- Calcula el total por ciudad
+- Resultados ordenados alfabéticamente por ciudad
+
+**Ejemplo de respuesta:**
+```json
+[
+  {
+    "ciudad": "Bogotá",
+    "masculino": 15,
+    "femenino": 12,
+    "total": 27
+  },
+  {
+    "ciudad": "Medellín",
+    "masculino": 8,
+    "femenino": 10,
+    "total": 18
+  }
+]
+```
+
+## 🛠️ Scripts de Utilidad (API ABB)
+
+### Crear 100 niños de prueba
+
+```bash
+cd api_abb
+./crear_100_ninos.sh
+```
+
+Este script crea 100 niños con datos aleatorios:
+- Nombres y apellidos variados
+- Edades entre 5 y 18 años
+- Distribución equitativa de género (50% M, 50% F)
+- 15 ciudades diferentes de Colombia
+- Al finalizar muestra el reporte por ciudad
+
 ## 📝 Notas
 
 - **ABB**: Documento puede ser cualquier entero positivo
 - **AVL**: Documento máximo de 6 dígitos (999999)
 - Los datos se almacenan en memoria (se pierden al reiniciar)
 - Ambas APIs pueden ejecutarse simultáneamente en diferentes puertos
+- **Nuevos campos requeridos**: `ciudad` y `genero` (Masculino/Femenino)

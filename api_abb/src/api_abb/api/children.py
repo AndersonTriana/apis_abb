@@ -68,6 +68,8 @@ async def create_child(
     - **documento**: Número de documento de identidad (único, mayor a 0)
     - **nombre**: Nombre completo del niño (requerido)
     - **edad**: Edad del niño entre 0 y 18 años (requerido)
+    - **ciudad**: Ciudad de residencia del niño (requerido)
+    - **genero**: Género del niño - "Masculino" o "Femenino" (requerido)
     - **acudiente**: Nombre del acudiente o tutor legal (opcional)
     - **notas**: Notas adicionales sobre el niño (opcional)
     """
@@ -172,6 +174,8 @@ async def update_child(
     - **documento**: Número de documento del niño a actualizar (no se puede cambiar)
     - **nombre**: Nuevo nombre del niño (opcional)
     - **edad**: Nueva edad del niño (opcional)
+    - **ciudad**: Nueva ciudad de residencia (opcional)
+    - **genero**: Nuevo género - "Masculino" o "Femenino" (opcional)
     - **acudiente**: Nuevo acudiente (opcional)
     - **notas**: Nuevas notas (opcional)
     

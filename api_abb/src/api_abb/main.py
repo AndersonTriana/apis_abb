@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from api_abb.api.children import router as children_router
+from api_abb.api.reports import router as reports_router
 
 app = FastAPI(
     title="API ABB - Gestión de Niños",
@@ -11,6 +12,7 @@ app = FastAPI(
 
 # Include routers
 app.include_router(children_router)
+app.include_router(reports_router)
 
 
 @app.get("/", tags=["root"])

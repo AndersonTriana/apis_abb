@@ -12,7 +12,8 @@ from api_abb.schemas.child import (
     ChildCreate,
     ChildUpdate,
     ChildResponse,
-    MessageResponse
+    MessageResponse,
+    CityGenderReport
 )
 from api_abb.service.child_service import ChildService
 
@@ -240,6 +241,26 @@ class ChildController:
         """
         try:
             return self.service.get_tree_info()
+        
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error interno del servidor: {str(e)}"
+            )
+    
+    def get_children_by_city_report(self) -> list[CityGenderReport]:
+        """
+        Generates a report of children grouped by city and gender.
+        
+        Returns:
+            List of CityGenderReport objects with statistics per city.
+        
+        Raises:
+            HTTPException: 500 if an unexpected error occurs.
+        """
+        try:
+            report_data = self.service.get_children_by_city_report()
+            return [CityGenderReport(**item) for item in report_data]
         
         except Exception as e:
             raise HTTPException(

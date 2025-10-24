@@ -193,6 +193,57 @@ class ChildService:
             "min_document": min_node.data["documento"] if min_node else None,
             "max_document": max_node.data["documento"] if max_node else None
         }
+    
+    def get_children_by_city_report(self) -> List[dict[str, Any]]:
+        """
+        Generates a report of children grouped by city and gender.
+        
+        Returns:
+            List of dictionaries with city statistics:
+            - ciudad: City name
+            - masculino: Count of male children
+            - femenino: Count of female children
+            - total: Total children in the city
+        """
+        # Get all children using inorder traversal
+        all_children = self.get_all_children(order="in")
+        
+        # Dictionary to accumulate counts by city
+        city_stats: dict[str, dict[str, int]] = {}
+        
+        for child in all_children:
+            ciudad = child.get("ciudad", "Sin ciudad")
+            genero = child.get("genero", "")
+            
+            # Initialize city entry if not exists
+            if ciudad not in city_stats:
+                city_stats[ciudad] = {
+                    "masculino": 0,
+                    "femenino": 0,
+                    "total": 0
+                }
+            
+            # Increment gender count
+            if genero == "Masculino":
+                city_stats[ciudad]["masculino"] += 1
+            elif genero == "Femenino":
+                city_stats[ciudad]["femenino"] += 1
+            
+            # Increment total count
+            city_stats[ciudad]["total"] += 1
+        
+        # Convert to list of report objects
+        report = [
+            {
+                "ciudad": ciudad,
+                "masculino": stats["masculino"],
+                "femenino": stats["femenino"],
+                "total": stats["total"]
+            }
+            for ciudad, stats in sorted(city_stats.items())
+        ]
+        
+        return report
 
 
 # Factory function to get the service instance

@@ -31,6 +31,8 @@ class TestCreateChild:
             "documento": 1234567890,
             "nombre": "Juan Pérez",
             "edad": 10,
+            "ciudad": "Bogotá",
+            "genero": "Masculino",
             "acudiente": "María Pérez",
             "notas": "Alérgico al maní"
         }
@@ -42,6 +44,8 @@ class TestCreateChild:
         assert data["documento"] == 1234567890
         assert data["nombre"] == "Juan Pérez"
         assert data["edad"] == 10
+        assert data["ciudad"] == "Bogotá"
+        assert data["genero"] == "Masculino"
         assert data["acudiente"] == "María Pérez"
         assert data["notas"] == "Alérgico al maní"
     
@@ -50,7 +54,9 @@ class TestCreateChild:
         child_data = {
             "documento": 9876543210,
             "nombre": "Ana García",
-            "edad": 5
+            "edad": 5,
+            "ciudad": "Medellín",
+            "genero": "Femenino"
         }
         
         response = client.post("/children", json=child_data)
@@ -60,6 +66,8 @@ class TestCreateChild:
         assert data["documento"] == 9876543210
         assert data["nombre"] == "Ana García"
         assert data["edad"] == 5
+        assert data["ciudad"] == "Medellín"
+        assert data["genero"] == "Femenino"
         assert data["acudiente"] is None
         assert data["notas"] is None
     
@@ -68,7 +76,9 @@ class TestCreateChild:
         child_data = {
             "documento": 1111111111,
             "nombre": "Test Child",
-            "edad": 8
+            "edad": 8,
+            "ciudad": "Cali",
+            "genero": "Masculino"
         }
         
         # First creation should succeed
@@ -85,7 +95,22 @@ class TestCreateChild:
         child_data = {
             "documento": 2222222222,
             "nombre": "Invalid Age",
-            "edad": 25  # Age > 18
+            "edad": 25,  # Age > 18
+            "ciudad": "Barranquilla",
+            "genero": "Masculino"
+        }
+        
+        response = client.post("/children", json=child_data)
+        assert response.status_code == 422  # Validation error
+    
+    def test_create_child_invalid_genero(self, client):
+        """Test creating a child with invalid genero."""
+        child_data = {
+            "documento": 2222222223,
+            "nombre": "Invalid Genero",
+            "edad": 10,
+            "ciudad": "Barranquilla",
+            "genero": "Otro"  # Invalid genero value
         }
         
         response = client.post("/children", json=child_data)
@@ -95,7 +120,7 @@ class TestCreateChild:
         """Test creating a child without required fields."""
         child_data = {
             "documento": 3333333333
-            # Missing nombre and edad
+            # Missing nombre, edad, ciudad, and genero
         }
         
         response = client.post("/children", json=child_data)
@@ -111,7 +136,9 @@ class TestGetChild:
         child_data = {
             "documento": 4444444444,
             "nombre": "Carlos López",
-            "edad": 12
+            "edad": 12,
+            "ciudad": "Cartagena",
+            "genero": "Masculino"
         }
         client.post("/children", json=child_data)
         
@@ -123,6 +150,8 @@ class TestGetChild:
         assert data["documento"] == 4444444444
         assert data["nombre"] == "Carlos López"
         assert data["edad"] == 12
+        assert data["ciudad"] == "Cartagena"
+        assert data["genero"] == "Masculino"
     
     def test_get_non_existing_child(self, client):
         """Test getting a non-existing child."""
@@ -146,11 +175,11 @@ class TestGetAllChildren:
         """Test getting all children in inorder (sorted by documento)."""
         # Create multiple children
         children = [
-            {"documento": 5000, "nombre": "Child 5000", "edad": 10},
-            {"documento": 3000, "nombre": "Child 3000", "edad": 8},
-            {"documento": 7000, "nombre": "Child 7000", "edad": 12},
-            {"documento": 2000, "nombre": "Child 2000", "edad": 6},
-            {"documento": 4000, "nombre": "Child 4000", "edad": 9},
+            {"documento": 5000, "nombre": "Child 5000", "edad": 10, "ciudad": "Bogotá", "genero": "Masculino"},
+            {"documento": 3000, "nombre": "Child 3000", "edad": 8, "ciudad": "Medellín", "genero": "Femenino"},
+            {"documento": 7000, "nombre": "Child 7000", "edad": 12, "ciudad": "Cali", "genero": "Masculino"},
+            {"documento": 2000, "nombre": "Child 2000", "edad": 6, "ciudad": "Barranquilla", "genero": "Femenino"},
+            {"documento": 4000, "nombre": "Child 4000", "edad": 9, "ciudad": "Cartagena", "genero": "Masculino"},
         ]
         
         for child in children:
@@ -170,9 +199,9 @@ class TestGetAllChildren:
     def test_get_all_children_preorder(self, client):
         """Test getting all children in preorder."""
         children = [
-            {"documento": 5000, "nombre": "Child 5000", "edad": 10},
-            {"documento": 3000, "nombre": "Child 3000", "edad": 8},
-            {"documento": 7000, "nombre": "Child 7000", "edad": 12},
+            {"documento": 5000, "nombre": "Child 5000", "edad": 10, "ciudad": "Bogotá", "genero": "Masculino"},
+            {"documento": 3000, "nombre": "Child 3000", "edad": 8, "ciudad": "Medellín", "genero": "Femenino"},
+            {"documento": 7000, "nombre": "Child 7000", "edad": 12, "ciudad": "Cali", "genero": "Masculino"},
         ]
         
         for child in children:
@@ -191,9 +220,9 @@ class TestGetAllChildren:
     def test_get_all_children_postorder(self, client):
         """Test getting all children in postorder."""
         children = [
-            {"documento": 5000, "nombre": "Child 5000", "edad": 10},
-            {"documento": 3000, "nombre": "Child 3000", "edad": 8},
-            {"documento": 7000, "nombre": "Child 7000", "edad": 12},
+            {"documento": 5000, "nombre": "Child 5000", "edad": 10, "ciudad": "Bogotá", "genero": "Masculino"},
+            {"documento": 3000, "nombre": "Child 3000", "edad": 8, "ciudad": "Medellín", "genero": "Femenino"},
+            {"documento": 7000, "nombre": "Child 7000", "edad": 12, "ciudad": "Cali", "genero": "Masculino"},
         ]
         
         for child in children:
@@ -226,6 +255,8 @@ class TestUpdateChild:
             "documento": 6000,
             "nombre": "Original Name",
             "edad": 10,
+            "ciudad": "Bogotá",
+            "genero": "Masculino",
             "acudiente": "Original Acudiente"
         }
         client.post("/children", json=child_data)
@@ -234,6 +265,8 @@ class TestUpdateChild:
         update_data = {
             "nombre": "Updated Name",
             "edad": 11,
+            "ciudad": "Medellín",
+            "genero": "Femenino",
             "acudiente": "Updated Acudiente",
             "notas": "New notes"
         }
@@ -244,6 +277,8 @@ class TestUpdateChild:
         assert data["documento"] == 6000  # Documento unchanged
         assert data["nombre"] == "Updated Name"
         assert data["edad"] == 11
+        assert data["ciudad"] == "Medellín"
+        assert data["genero"] == "Femenino"
         assert data["acudiente"] == "Updated Acudiente"
         assert data["notas"] == "New notes"
     
@@ -254,6 +289,8 @@ class TestUpdateChild:
             "documento": 7000,
             "nombre": "Original Name",
             "edad": 10,
+            "ciudad": "Cali",
+            "genero": "Masculino",
             "acudiente": "Original Acudiente"
         }
         client.post("/children", json=child_data)
@@ -268,6 +305,8 @@ class TestUpdateChild:
         data = response.json()
         assert data["nombre"] == "Original Name"  # Unchanged
         assert data["edad"] == 11  # Updated
+        assert data["ciudad"] == "Cali"  # Unchanged
+        assert data["genero"] == "Masculino"  # Unchanged
         assert data["acudiente"] == "Original Acudiente"  # Unchanged
     
     def test_update_non_existing_child(self, client):
@@ -291,7 +330,9 @@ class TestDeleteChild:
         child_data = {
             "documento": 8000,
             "nombre": "To Delete",
-            "edad": 10
+            "edad": 10,
+            "ciudad": "Pereira",
+            "genero": "Femenino"
         }
         client.post("/children", json=child_data)
         
@@ -322,7 +363,9 @@ class TestIntegrationScenarios:
         child_data = {
             "documento": 1000,
             "nombre": "Test Child",
-            "edad": 10
+            "edad": 10,
+            "ciudad": "Bucaramanga",
+            "genero": "Masculino"
         }
         create_response = client.post("/children", json=child_data)
         assert create_response.status_code == 201
@@ -350,10 +393,10 @@ class TestIntegrationScenarios:
         """Test operations with multiple children."""
         # Create multiple children
         children = [
-            {"documento": 100, "nombre": "Child 100", "edad": 5},
-            {"documento": 200, "nombre": "Child 200", "edad": 10},
-            {"documento": 150, "nombre": "Child 150", "edad": 7},
-            {"documento": 50, "nombre": "Child 50", "edad": 3},
+            {"documento": 100, "nombre": "Child 100", "edad": 5, "ciudad": "Bogotá", "genero": "Masculino"},
+            {"documento": 200, "nombre": "Child 200", "edad": 10, "ciudad": "Medellín", "genero": "Femenino"},
+            {"documento": 150, "nombre": "Child 150", "edad": 7, "ciudad": "Cali", "genero": "Masculino"},
+            {"documento": 50, "nombre": "Child 50", "edad": 3, "ciudad": "Barranquilla", "genero": "Femenino"},
         ]
         
         for child in children:
